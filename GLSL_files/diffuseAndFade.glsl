@@ -17,7 +17,7 @@ void main(){
 
 	// Change strength of diffusion
 	// And slowly fade the image by making sure the sums of the two numbers being used for multiplication is < 1
-	newPixel = (pixel*0.45 + newPixel*0.5);
+	newPixel = (pixel*0.49 + newPixel*0.5);
 
 	imageStore(img, pixel_coords, newPixel);
 }
