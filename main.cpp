@@ -43,7 +43,7 @@ int main(){
 	// Init glfw
 	if(!glfwInit()){ return -1; }
 
-	// Use openGL 4.5, core profile
+	// Use openGL 4.6, core profile
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -94,7 +94,7 @@ int main(){
     shader1.setUniform1f("ratio", ratio);
 
     // Create a texture
-    unsigned int res = 4096;
+    unsigned int res = 2048;
     unsigned int* textures = new unsigned int[1];
     makeTextures(textures, 1, res);
     activebindtex(textures[0], 0, 0);
@@ -103,13 +103,14 @@ int main(){
     computeShaderClass agent("GLSL_files/agent.glsl");
     agent.use();
     glUniform1i(glGetUniformLocation(agent.ID, "size"), res);
-    glUniform1f(glGetUniformLocation(agent.ID, "sensorDistance"), 40.0f);
+    glUniform1f(glGetUniformLocation(agent.ID, "sensorDistance"), 50.0f);
     glUniform1f(glGetUniformLocation(agent.ID, "angleChange"), 0.3f);
     glUniform1f(glGetUniformLocation(agent.ID, "turnSpeed"), 2.0f);
     computeShaderClass diffuseAndFade("GLSL_files/diffuseAndFade.glsl");
     diffuseAndFade.use();
 	glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "pixelMult"), 0.1f);
 	glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "newPixelMult"), 0.895f);
+	glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "texSize"), res);
 		
     // Create some data to send to the compute shader
     struct shader_data_t
