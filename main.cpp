@@ -103,11 +103,14 @@ int main(){
     computeShaderClass agent("GLSL_files/agent.glsl");
     agent.use();
     glUniform1i(glGetUniformLocation(agent.ID, "size"), res);
-    glUniform1f(glGetUniformLocation(agent.ID, "sensorDistance"), 100.0f);
-    glUniform1f(glGetUniformLocation(agent.ID, "angleChange"), 0.8f);
+    glUniform1f(glGetUniformLocation(agent.ID, "sensorDistance"), 40.0f);
+    glUniform1f(glGetUniformLocation(agent.ID, "angleChange"), 0.3f);
     glUniform1f(glGetUniformLocation(agent.ID, "turnSpeed"), 2.0f);
     computeShaderClass diffuseAndFade("GLSL_files/diffuseAndFade.glsl");
-
+    diffuseAndFade.use();
+	glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "pixelMult"), 0.1f);
+	glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "newPixelMult"), 0.895f);
+		
     // Create some data to send to the compute shader
     struct shader_data_t
     {

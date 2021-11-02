@@ -19,7 +19,7 @@ float rand(vec2 co){
   return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
 
-vec4 getPixel(float angle, float dist, unsigned int agentID){
+vec4 getPixel(float angle, float dist, uint agentID){
 	vec2 location = vec2(xPos[agentID], yPos[agentID]) + vec2(cos(angle), sin(angle))*dist;
 	return imageLoad(img, ivec2(int(location[0]), int(location[1])));
 }
@@ -32,7 +32,7 @@ void loopBounds(inout vec2 pos){
 }
 
 void main(){
-	unsigned int agentID = gl_GlobalInvocationID.x;
+	uint agentID = gl_GlobalInvocationID.x;
 
 	float random = rand(vec2(xPos[agentID], yPos[agentID]));
 

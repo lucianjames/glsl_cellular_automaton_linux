@@ -3,6 +3,9 @@
 layout(local_size_x = 1, local_size_y = 1) in;
 layout(rgba32f, binding = 0) uniform image2D img;
 
+uniform float pixelMult;
+uniform float newPixelMult;
+
 void main(){
 	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
 
@@ -17,7 +20,7 @@ void main(){
 
 	// Change strength of diffusion
 	// And slowly fade the image by making sure the sums of the two numbers being used for multiplication is < 1
-	newPixel = (pixel*0.49 + newPixel*0.5);
+	newPixel = (pixel*pixelMult + newPixel*newPixelMult);
 
 	imageStore(img, pixel_coords, newPixel);
 }
