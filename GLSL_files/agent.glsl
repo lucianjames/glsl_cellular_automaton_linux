@@ -25,11 +25,11 @@ vec4 getPixel(float angle, float dist, uint agentID){
 	if (location[0] >= size){
 		location[0] = location[0]-size;
 	}
-	if (location[1] >= size){
-		location[1] = location[1]-size;
+	if (location[1] <= 0){
+		location[1] = size+location[1];
 	}
-	if (location[0] <= 0){
-		location[0] = size+location[0];
+	if (location[0] >= size){
+		location[0] = location[0]-size;
 	}
 	if (location[1] <= 0){
 		location[1] = size+location[1];

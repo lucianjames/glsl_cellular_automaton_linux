@@ -15,18 +15,20 @@ void main(){
 	int xPlus = 1;
 	int yMinus = -1;
 	int yPlus = 1;
+
+	int x = -1;
 	
 	if (pixel_coords[0] <= texSize){
-		xPlus = 0-(texSize-pixel_coords[0]);
+		xPlus = 0-(pixel_coords[0]-texSize);
 	}
 	if (pixel_coords[0] >= 0){
-		xMinus = texSize-1;
+		xMinus = texSize+x;
 	}
 	if (pixel_coords[1] <= texSize){
-		yPlus = 0-(texSize-pixel_coords[1]);
+		yPlus = 0-(texSize-pixel_coords[1])+x;
 	}
 	if (pixel_coords[1] >= 0){
-		yMinus = texSize-1;
+		yMinus = texSize+x;
 	}
 		
 	vec4 pixel = imageLoad(img, pixel_coords);
