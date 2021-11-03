@@ -110,8 +110,8 @@ int main(){
     diffuseAndFade.use();
 	glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "pixelMult"), 0.1f);
 	glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "newPixelMult"), 0.895f);
-	glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "texSize"), res);
-		
+	GLCall(glUniform1i(glGetUniformLocation(diffuseAndFade.ID, "size"), res));
+
     // Create some data to send to the compute shader
     struct shader_data_t
     {

@@ -3,10 +3,9 @@
 layout(local_size_x = 1, local_size_y = 1) in;
 layout(rgba32f, binding = 0) uniform image2D img;
 
-uniform float pixelMult;
-uniform float newPixelMult;
-
-uniform int texSize;
+layout(location = 2) uniform float pixelMult;
+layout(location = 3) uniform float newPixelMult;
+layout(location = 4) uniform int size;
 
 void main(){
 	ivec2 pixel_coords = ivec2(gl_GlobalInvocationID.xy);
@@ -16,21 +15,12 @@ void main(){
 	int yMinus = -1;
 	int yPlus = 1;
 
-	int x = -1;
-	
-	if (pixel_coords[0] <= texSize){
-		xPlus = 0-(pixel_coords[0]-texSize);
-	}
-	if (pixel_coords[0] >= 0){
-		xMinus = texSize+x;
-	}
-	if (pixel_coords[1] <= texSize){
-		yPlus = 0-(texSize-pixel_coords[1])+x;
-	}
-	if (pixel_coords[1] >= 0){
-		yMinus = texSize+x;
-	}
-		
+	if (pixel_coords[0] == size-1){ xPlus = -(size-1); }
+    else if (pixel_coords[0] <= 0){ xMinus = size-1; }
+
+	if (pixel_coords[1] == size-1){ yPlus = -(size-1); }
+    else if (pixel_coords[1] <= 0){ yMinus = size-1; }
+
 	vec4 pixel = imageLoad(img, pixel_coords);
 	vec4 newPixel = vec4(0.0f);
 	newPixel += pixel;
