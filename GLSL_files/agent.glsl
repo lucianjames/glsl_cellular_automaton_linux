@@ -21,11 +21,12 @@ float rand(vec2 co){
 
 vec4 getPixel(float angle, float dist, uint agentID){
 	vec2 location = vec2(xPos[agentID], yPos[agentID]) + vec2(cos(angle), sin(angle))*dist;
-	if (location[0] >= size){ location[0] = size-location[0]; }
-	if (location[0] <= 0){ location [0] = size+location[0]; }
-    if (location[1] >= size){ location[1] = size-location[1]; }
-    if (location[1] <= 0){ location[1] = size+location[1]; }
-	return imageLoad(img, ivec2(int(location[0]), int(location[1])));
+	ivec2 intLoc = ivec2(int(location[0]), int(location[1]));
+	if (intLoc[0] >= size){ intLoc[0] = size-intLoc[0]; }
+	if (intLoc[0] <= 0){ intLoc [0] = size+intLoc[0]; }
+    if (intLoc[1] >= size){ intLoc[1] = size-intLoc[1]; }
+    if (intLoc[1] <= 0){ intLoc[1] = size+intLoc[1]; }
+	return imageLoad(img, intLoc);
 }
 
 void loopBounds(inout vec2 pos){

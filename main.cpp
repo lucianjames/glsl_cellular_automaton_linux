@@ -49,7 +49,7 @@ int main(){
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Create a window
-	window = glfwCreateWindow(1024,1024,"Window", nullptr, nullptr);
+	window = glfwCreateWindow(1024,1024,"Agent simulation", nullptr, nullptr);
 	if (!window) {glfwTerminate(); return -1;}
 	glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -103,9 +103,9 @@ int main(){
     computeShaderClass agent("GLSL_files/agent.glsl");
     agent.use();
     glUniform1i(glGetUniformLocation(agent.ID, "size"), res);
-    glUniform1f(glGetUniformLocation(agent.ID, "sensorDistance"), 50.0f);
-    glUniform1f(glGetUniformLocation(agent.ID, "angleChange"), 0.3f);
-    glUniform1f(glGetUniformLocation(agent.ID, "turnSpeed"), 2.0f);
+    glUniform1f(glGetUniformLocation(agent.ID, "sensorDistance"), 20.0f);
+    glUniform1f(glGetUniformLocation(agent.ID, "angleChange"), 0.5f);
+    glUniform1f(glGetUniformLocation(agent.ID, "turnSpeed"), 10.0f);
     computeShaderClass diffuseAndFade("GLSL_files/diffuseAndFade.glsl");
     diffuseAndFade.use();
 	glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "pixelMult"), 0.1f);
@@ -146,7 +146,7 @@ int main(){
     */
 
     // Make it possible to actually read/write to ssbo
-    unsigned int block_index = 0;
+    unsigned int block_index;
     block_index = glGetProgramResourceIndex(agent.ID, GL_SHADER_STORAGE_BLOCK, "shader_data");
     glShaderStorageBlockBinding(agent.ID, block_index, 0);
     unsigned int binding_point_index = 0;
