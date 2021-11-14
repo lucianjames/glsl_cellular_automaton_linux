@@ -8,20 +8,21 @@
 #include "headers/VAO.h"
 #include "headers/VBO.h"
 #include "headers/IBO.h"
+#include "headers/SSBO.h"
 #include "headers/VBO_layout.h"
 #include "headers/renderer.h"
 #include "headers/texture.h"
 #include "headers/debugging.h"
 
-#define AGENT_N 100000
+#define AGENT_N 50000
 
-void processInput(GLFWwindow* window, float& zoom, float& offsetX, float& offsetY) {
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) { zoom *= 0.99f; }
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) { zoom /= 0.99f; }
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) { offsetX -= 0.01f * zoom; }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) { offsetX += 0.01f * zoom; }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) { offsetY -= 0.01f * zoom; }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) { offsetY += 0.01f * zoom; }
+void processInput(GLFWwindow* window, float& zoom, float& offsetX, float& offsetY, bool& paused, const double frameTime) {
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) { zoom *= 1.0f - (0.005 * frameTime); }
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) { zoom /= 1.0f - (0.005 * frameTime); }
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) { offsetX -= 0.001f * zoom * frameTime; }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) { offsetX += 0.001f * zoom * frameTime; }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) { offsetY -= 0.001f * zoom * frameTime; }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) { offsetY += 0.001f * zoom * frameTime; }
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) { glfwSetWindowShouldClose(window, 1); }
 }
 
@@ -60,7 +61,7 @@ int main(){
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-
+    
     // Vertex position + UV + indice data (pos is screenspace)
     float verts[] = {
        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
@@ -78,7 +79,6 @@ int main(){
     VBO_layout layout;
     layout.pushFloat(3); // Position data
     layout.pushFloat(2); // TexCoord data
-    std::cout << sizeof(indices) << std::endl;
     IBO indexBuffer(indices, sizeof(indices));
     VAO vertexArray;
     vertexArray.addBuffer(vertexBuffer, layout);
@@ -94,18 +94,18 @@ int main(){
     shader1.setUniform1f("ratio", ratio);
 
     // Create a texture
-    unsigned int res = 2048;
+    unsigned int res = 1024;
     unsigned int* textures = new unsigned int[1];
     makeTextures(textures, 1, res);
     activebindtex(textures[0], 0, 0);
-
+    
     // Create compute shader programs
     computeShaderClass agent("GLSL_files/agent.glsl");
     agent.use();
     glUniform1i(glGetUniformLocation(agent.ID, "size"), res);
-    glUniform1f(glGetUniformLocation(agent.ID, "sensorDistance"), 20.0f);
-    glUniform1f(glGetUniformLocation(agent.ID, "angleChange"), 0.5f);
-    glUniform1f(glGetUniformLocation(agent.ID, "turnSpeed"), 10.0f);
+    glUniform1f(glGetUniformLocation(agent.ID, "sensorDistance"), 100.0f);
+    glUniform1f(glGetUniformLocation(agent.ID, "angleChange"), 0.2f);
+    glUniform1f(glGetUniformLocation(agent.ID, "turnSpeed"), 2.0f);
     computeShaderClass diffuseAndFade("GLSL_files/diffuseAndFade.glsl");
     diffuseAndFade.use();
 	glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "pixelMult"), 0.1f);
@@ -124,37 +124,26 @@ int main(){
     shader_data_t *shader_data = new shader_data_t;
 
     for (auto& i : shader_data->xPos) {
-        i = (res / 2) + (res / 4) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        i = (res / 2) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        //i = res/2;
     }
     for (auto& i : shader_data->yPos) {
-        i = (res/2) + (res/4) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        i = (res/2) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+        //i = res/2;
     }
     for (auto& i : shader_data->angle) {
         i = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * 2 * 3.14159265359;
     }
-
-    // Create a shader storage buffer object
-    unsigned int ssbo;
-    GLCall(glGenBuffers(1, &ssbo));
-    GLCall(glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo));
-    GLCall(glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(shader_data->xPos)*3, shader_data, GL_DYNAMIC_COPY));
-
-    /*
-    void* p = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_WRITE);
-    memcpy(p, &shader_data, sizeof(shader_data->xPos)*3);
-    GLCall(glUnmapBuffer(GL_SHADER_STORAGE_BUFFER));
-    */
-
-    // Make it possible to actually read/write to ssbo
-    unsigned int block_index;
-    block_index = glGetProgramResourceIndex(agent.ID, GL_SHADER_STORAGE_BLOCK, "shader_data");
-    glShaderStorageBlockBinding(agent.ID, block_index, 0);
-    unsigned int binding_point_index = 0;
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_point_index, ssbo);
-
+	
+	SSBO ssbo(shader_data, sizeof(shader_data->xPos)*3);
+	ssbo.bind(agent.ID, "shader_data");
+	
     // Misc setup stuff
     glDisable(GL_BLEND);
     glClearColor(0.0f, 1.0f, 0.0f, 1.0);
+    bool paused = false;
+    bool spacePressed = false;
+    double frameTime = 0;
     double lastTime = glfwGetTime();
     int nbFrames = 0;
     // Render loop
@@ -165,7 +154,8 @@ int main(){
         double currentTime = glfwGetTime();
         nbFrames++;
         if (currentTime - lastTime >= 1.0) { // If last prinf() was more than 1 sec ago
-            printf("%f ms/frame\n", 1000.0 / double(nbFrames));
+        	frameTime = 1000/(double)nbFrames;
+            printf("%f ms/frame\n", frameTime);
             nbFrames = 0;
             lastTime += 1.0;
         }
@@ -174,23 +164,30 @@ int main(){
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        // Run compute shaders
-        agent.use();
-        glDispatchCompute(AGENT_N, 1, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-        diffuseAndFade.use();
-        glDispatchCompute(res, res, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-
+        
+		if (!paused){
+	        // Run compute shaders
+	        agent.use();
+	        glDispatchCompute(AGENT_N, 1, 1);
+	        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+	        diffuseAndFade.use();
+	        glDispatchCompute(res, res, 1);
+	        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+		}
+		
         // Render texture
         shader1.use();
-        processInput(window, zoom, offset[0], offset[1]);
         shader1.setUniform1f("zoom", zoom);
         shader1.setUniform2f("offset", offset[1], offset[0]);
         activebindtex(textures[0], 0, 0);
         renderer.draw(vertexArray, indexBuffer, shader1);
 
+		// Process inputs
+		processInput(window, zoom, offset[0], offset[1], paused, frameTime);
+		bool spaceCurrentlyPressed = glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS;
+		if (!spacePressed && spaceCurrentlyPressed) { paused = !paused; }
+		spacePressed = spaceCurrentlyPressed;
+		
         // Check if window dimensions have changed
         if (currentWindowWidth != newWindowWidth || currentWindowHeight != newWindowHeight) {
             currentWindowWidth = newWindowWidth;

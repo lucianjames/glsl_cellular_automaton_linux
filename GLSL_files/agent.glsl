@@ -1,5 +1,7 @@
 #version 460 core
 
+#define AGENT_N 50000
+
 layout(local_size_x = 1, local_size_y = 1) in;
 layout(rgba32f, binding = 0) uniform image2D img;
 layout(location = 3) uniform int size;
@@ -9,15 +11,10 @@ layout(location = 6) uniform float turnSpeed;
 
 layout (std430, binding=2) buffer shader_data
 { 
-  float xPos[100000];
-  float yPos[100000];
-  float angle[100000];
+  float xPos[AGENT_N];
+  float yPos[AGENT_N];
+  float angle[AGENT_N];
 };
-
-// This behaves kind of like a hash function
-float rand(vec2 co){
-  return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
-}
 
 vec4 getPixel(float angle, float dist, uint agentID){
 	vec2 location = vec2(xPos[agentID], yPos[agentID]) + vec2(cos(angle), sin(angle))*dist;
@@ -38,8 +35,6 @@ void loopBounds(inout vec2 pos){
 
 void main(){
 	uint agentID = gl_GlobalInvocationID.x;
-
-	float random = rand(vec2(xPos[agentID], yPos[agentID]));
 	
 	// Change agent angle
 	float leftSensor = getPixel(angle[agentID]+angleChange, sensorDistance, agentID).w; // Uses alpha channel
@@ -58,5 +53,5 @@ void main(){
 	xPos[agentID] = newpos[0]; yPos[agentID] = newpos[1];
 
 	// Draw a pixel at the agents location
-	imageStore(img, ivec2(int(xPos[agentID]), int(yPos[agentID])), vec4(0.0f, 1.0f, (direction[0]+direction[1]+2)/4, 1.0f));
+	imageStore(img, ivec2(int(xPos[agentID]), int(yPos[agentID])), vec4(0.0f, 1.0f, (direction[1]+1)/2, 1.0f));
 }
