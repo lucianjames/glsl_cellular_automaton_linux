@@ -16,6 +16,11 @@
 
 #define AGENT_N 50000
 
+int newWindowWidth = 1024;
+int newWindowHeight = 1024;
+int currentWindowWidth = newWindowWidth;
+int currentWindowHeight = newWindowHeight;
+
 void processInput(GLFWwindow* window, float& zoom, float& offsetX, float& offsetY, bool& paused, const double frameTime) {
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) { zoom *= 1.0f - (0.005 * frameTime); }
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) { zoom /= 1.0f - (0.005 * frameTime); }
@@ -25,11 +30,6 @@ void processInput(GLFWwindow* window, float& zoom, float& offsetX, float& offset
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) { offsetY += 0.001f * zoom * frameTime; }
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) { glfwSetWindowShouldClose(window, 1); }
 }
-
-int newWindowWidth = 1024;
-int newWindowHeight = 1024;
-int currentWindowWidth = newWindowWidth;
-int currentWindowHeight = newWindowHeight;
 
 // This is called whenever the window is resized
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -62,7 +62,7 @@ int main(){
         return -1;
     }
     
-    // Vertex position + UV + indice data (pos is screenspace)
+    // Vertex position + UV + indice data for a quad
     float verts[] = {
        -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
         1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
@@ -94,12 +94,12 @@ int main(){
     shader1.setUniform1f("ratio", ratio);
 
     // Create a texture
-    unsigned int res = 1024;
+    unsigned int res = 2048;
     unsigned int* textures = new unsigned int[1];
     makeTextures(textures, 1, res);
     activebindtex(textures[0], 0, 0);
     
-    // Create compute shader programs
+    // Create compute shader programs and set their uniforms
     computeShaderClass agent("GLSL_files/agent.glsl");
     agent.use();
     glUniform1i(glGetUniformLocation(agent.ID, "size"), res);
@@ -134,7 +134,8 @@ int main(){
     for (auto& i : shader_data->angle) {
         i = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * 2 * 3.14159265359;
     }
-	
+
+	// Create compute shader buffer object
 	SSBO ssbo(shader_data, sizeof(shader_data->xPos)*3);
 	ssbo.bind(agent.ID, "shader_data");
 	
