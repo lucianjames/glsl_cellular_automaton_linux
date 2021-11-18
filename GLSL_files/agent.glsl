@@ -21,8 +21,8 @@ vec4 getPixel(float angle, float dist, uint agentID){
 	ivec2 intLoc = ivec2(int(location[0]), int(location[1]));
 	if (intLoc[0] >= size){ intLoc[0] = size-intLoc[0]; }
 	if (intLoc[0] <= 0){ intLoc [0] = size+intLoc[0]; }
-    if (intLoc[1] >= size){ intLoc[1] = size-intLoc[1]; }
-    if (intLoc[1] <= 0){ intLoc[1] = size+intLoc[1]; }
+	if (intLoc[1] >= size){ intLoc[1] = size-intLoc[1]; }
+	if (intLoc[1] <= 0){ intLoc[1] = size+intLoc[1]; }
 	return imageLoad(img, intLoc);
 }
 
