@@ -16,9 +16,9 @@ void main(){
 	int yPlus = 1;
 
 	if (pixel_coords[0] >= size-1){ xPlus = -(size-1); }
-    else if (pixel_coords[0] <= 0){ xMinus = size-1; }
+	else if (pixel_coords[0] <= 0){ xMinus = size-1; }
 	if (pixel_coords[1] >= size-1){ yPlus = -(size-1); }
-    else if (pixel_coords[1] <= 0){ yMinus = size-1; }
+	else if (pixel_coords[1] <= 0){ yMinus = size-1; }
 
 	vec4 pixel = imageLoad(img, pixel_coords);
 	vec4 newPixel = vec4(0.0f);
