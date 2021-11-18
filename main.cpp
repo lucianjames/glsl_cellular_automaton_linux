@@ -53,14 +53,14 @@ int main(){
 	window = glfwCreateWindow(1024,1024,"Agent simulation", nullptr, nullptr);
 	if (!window) {glfwTerminate(); return -1;}
 	glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSwapInterval(0);; // vsync
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSwapInterval(0);; // vsync
 	
 	// Init GLAD
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
     
     // Vertex position + UV + indice data for a quad
     float verts[] = {
@@ -108,9 +108,9 @@ int main(){
     glUniform1f(glGetUniformLocation(agent.ID, "turnSpeed"), 2.0f);
     computeShaderClass diffuseAndFade("GLSL_files/diffuseAndFade.glsl");
     diffuseAndFade.use();
-	glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "pixelMult"), 0.1f);
-	glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "newPixelMult"), 0.895f);
-	GLCall(glUniform1i(glGetUniformLocation(diffuseAndFade.ID, "size"), res));
+    glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "pixelMult"), 0.1f);
+    glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "newPixelMult"), 0.895f);
+    GLCall(glUniform1i(glGetUniformLocation(diffuseAndFade.ID, "size"), res));
 
     // Create some data to send to the compute shader
     struct shader_data_t
@@ -134,10 +134,9 @@ int main(){
     for (auto& i : shader_data->angle) {
         i = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * 2 * 3.14159265359;
     }
-
-	// Create compute shader buffer object
-	SSBO ssbo(shader_data, sizeof(shader_data->xPos)*3);
-	ssbo.bind(agent.ID, "shader_data");
+    // Create compute shader buffer object
+    SSBO ssbo(shader_data, sizeof(shader_data->xPos)*3);
+    ssbo.bind(agent.ID, "shader_data");
 	
     // Misc setup stuff
     glDisable(GL_BLEND);
