@@ -19,18 +19,18 @@ layout (std430, binding=2) buffer shader_data
 vec4 getPixel(float angle, float dist, uint agentID){
 	vec2 location = vec2(xPos[agentID], yPos[agentID]) + vec2(cos(angle), sin(angle))*dist;
 	ivec2 intLoc = ivec2(int(location[0]), int(location[1]));
-	if (intLoc[0] >= size){ intLoc[0] = size-intLoc[0]; }
-	if (intLoc[0] <= 0){ intLoc [0] = size+intLoc[0]; }
-	if (intLoc[1] >= size){ intLoc[1] = size-intLoc[1]; }
-	if (intLoc[1] <= 0){ intLoc[1] = size+intLoc[1]; }
+	if (intLoc[0] >= size){ intLoc[0] -= size-1; }
+	if (intLoc[0] <= 0){ intLoc [0] += size+1; }	
+	if (intLoc[1] >= size){ intLoc[1] -= size-1; }
+	if (intLoc[1] <= 0){ intLoc[1] += size+1; }
 	return imageLoad(img, intLoc);
 }
 
 void loopBounds(inout vec2 pos){
-	if(pos[0] >= size){ pos[0] = 1; }
-	if(pos[1] >= size){ pos[1] = 1; }
-	if(pos[0] <= 0){ pos[0] = size-1; }
-	if(pos[1] <= 0){ pos[1] = size-1; }
+	if(pos[0] >= size){ pos[0] -= size; }
+	if(pos[1] >= size){ pos[1] -= size; }
+	if(pos[0] <= 0){ pos[0] += size; }
+	if(pos[1] <= 0){ pos[1] += size; }
 }
 
 void main(){
