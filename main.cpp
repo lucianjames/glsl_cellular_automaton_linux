@@ -39,6 +39,18 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 }
 
 int main(){
+
+	// Get user input for some of the simulation settings
+	float sensDist = 0;
+	float anglChng = 0;
+	float trnSpd = 0;
+	std::cout << "Enter sensor distance: ";
+	std::cin >> sensDist;
+	std::cout << "Enter angle of sensors: ";
+	std::cin >> anglChng;
+	std::cout << "Enter turn speed: ";
+    std::cin >> trnSpd;
+
 	GLFWwindow* window;
 
 	// Init glfw
@@ -54,7 +66,7 @@ int main(){
 	if (!window) {glfwTerminate(); return -1;}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSwapInterval(0);; // vsync
+	glfwSwapInterval(0); // vsync
 	
 	// Init GLAD
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
@@ -94,7 +106,7 @@ int main(){
     shader1.setUniform1f("ratio", ratio);
 
     // Create a texture
-    unsigned int res = 2048;
+    unsigned int res = 1024;
     unsigned int* textures = new unsigned int[1];
     makeTextures(textures, 1, res);
     activebindtex(textures[0], 0, 0);
@@ -103,9 +115,9 @@ int main(){
     computeShaderClass agent("GLSL_files/agent.glsl");
     agent.use();
     glUniform1i(glGetUniformLocation(agent.ID, "size"), res);
-    glUniform1f(glGetUniformLocation(agent.ID, "sensorDistance"), 100.0f);
-    glUniform1f(glGetUniformLocation(agent.ID, "angleChange"), 0.2f);
-    glUniform1f(glGetUniformLocation(agent.ID, "turnSpeed"), 2.0f);
+    glUniform1f(glGetUniformLocation(agent.ID, "sensorDistance"), sensDist);
+    glUniform1f(glGetUniformLocation(agent.ID, "angleChange"), anglChng);
+    glUniform1f(glGetUniformLocation(agent.ID, "turnSpeed"), trnSpd);
     computeShaderClass diffuseAndFade("GLSL_files/diffuseAndFade.glsl");
     diffuseAndFade.use();
     glUniform1f(glGetUniformLocation(diffuseAndFade.ID, "pixelMult"), 0.1f);
@@ -124,12 +136,10 @@ int main(){
     shader_data_t *shader_data = new shader_data_t;
 
     for (auto& i : shader_data->xPos) {
-        i = (res / 2) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-        //i = res/2;
+        //i = res/4 * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     }
     for (auto& i : shader_data->yPos) {
-        i = (res/2) * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-        //i = res/2;
+        //i = res/4 * static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     }
     for (auto& i : shader_data->angle) {
         i = static_cast <float> (rand()) / static_cast <float> (RAND_MAX) * 2 * 3.14159265359;
