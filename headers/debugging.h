@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 // Debugging macro
 #define GLCall(x) GLClearError(); x; GLLogCall(#x, __FILE__, __LINE__)

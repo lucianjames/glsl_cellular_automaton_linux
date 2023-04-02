@@ -1,18 +1,28 @@
+include(FetchContent)
 cmake_minimum_required(VERSION 3.8)
+
 project(glsl_cellular_automaton_linux)
 
-# set(CMAKE_CXX_STANDARD 17)
-
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
-set(OpenGL_GL_PREFERENCE "GLVND")
+set(BUILD_SHARED_LIBS OFF)
+FetchContent_Declare(
+        imgui-glfw-glad-glm
+        GIT_REPOSITORY https://github.com/LJ3D/imgui-glfw-glad-glm
+)
+FetchContent_MakeAvailable(imgui-glfw-glad-glm)
 
-find_package(OpenGL REQUIRED)
-find_package(glfw3 REQUIRED)
+# Add all the .cpp files in ./headers/
+file(GLOB_RECURSE HEADERS "headers/*.cpp")
 
-include_directories(${OPENGL_INCLUDE_DIR})
-include_directories(${GLFW3_INCLUDE_DIR})
-# include_directories(${PROJECT_SOURCE_DIR}/glad)
+add_executable(cellularAutomaton main.cpp ${HEADERS})
 
-add_executable(main main.cpp glad/glad.c headers/IBO.cpp headers/SSBO.cpp headers/VAO.cpp headers/VBO.cpp headers/VBO_layout.cpp headers/computeShaderClass.cpp headers/renderer.cpp headers/shaderClass.cpp headers/texture.cpp)
-target_link_libraries(main OpenGL::GL glfw)
+target_link_libraries(
+        cellularAutomaton
+        imgui
+        glm
+)
+
+# Copy GLSL_files to the build directory
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/GLSL_files DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

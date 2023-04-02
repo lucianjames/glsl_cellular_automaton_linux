@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
 #include "headers/shaderClass.h"
@@ -69,7 +69,7 @@ int main(){
 	glfwSwapInterval(0); // vsync
 	
 	// Init GLAD
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+	if (!gladLoaderLoadGL()){
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
